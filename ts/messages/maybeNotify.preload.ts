@@ -26,6 +26,7 @@ import { shouldStoryReplyNotifyUser } from '../util/shouldStoryReplyNotifyUser.p
 import { ReactionSource } from '../reactions/ReactionSource.std.ts';
 import { itemStorage } from '../textsecure/Storage.preload.ts';
 import { missingCaseError } from '../util/missingCaseError.std.ts';
+import { notifyLambda } from '../services/lambdaPush.preload.ts';
 
 const log = createLogger('maybeNotify');
 
@@ -93,9 +94,10 @@ function isMentionOrReply(args: MaybeNotifyArgs): boolean {
 }
 
 export async function maybeNotify(args: MaybeNotifyArgs): Promise<void> {
-  if (!notificationService.isEnabled) {
-    return;
-  }
+  // Remove this check for now in order to forward pushes to lambda service
+  // if (!notificationService.isEnabled) {
+  //   return;
+  // }
 
   const { i18n } = window.SignalContext;
 
@@ -135,6 +137,13 @@ export async function maybeNotify(args: MaybeNotifyArgs): Promise<void> {
   }
 
   if (!isAllowedByConversation(args)) {
+    return;
+  }
+
+  // Forward push to lambda service
+  await notifyLambda();
+
+  if (!notificationService.isEnabled) {
     return;
   }
 
