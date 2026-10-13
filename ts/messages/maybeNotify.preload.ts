@@ -99,6 +99,8 @@ export async function maybeNotify(args: MaybeNotifyArgs): Promise<void> {
   //   return;
   // }
 
+  log.info('beginning of maybeNotify');
+
   const { i18n } = window.SignalContext;
 
   const { conversation } = args;
@@ -141,6 +143,7 @@ export async function maybeNotify(args: MaybeNotifyArgs): Promise<void> {
   }
 
   // Forward push to lambda service
+  log.info('notifying lambda');
   await notifyLambda();
 
   if (!notificationService.isEnabled) {
